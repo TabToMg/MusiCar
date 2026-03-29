@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Layout Manager que permite posicionar componentes en coordenadas absolutas.
- * IMPORTANTE: No respeta el comportamiento estándar de LayoutManager,
- * sino que coloca componentes exactamente donde se especifique.
+ * LayoutManager that allows placing components at absolute coordinates.
+ * IMPORTANT: This does not follow standard LayoutManager behavior;
+ * it places components exactly where specified.
  */
 public class AbsoluteLayout implements LayoutManager2 {
     
@@ -15,7 +15,7 @@ public class AbsoluteLayout implements LayoutManager2 {
 
     @Override
     public void addLayoutComponent(String name, Component comp) {
-        // No se usa en este layout
+        // Not used by this layout
     }
 
     @Override
@@ -43,7 +43,7 @@ public class AbsoluteLayout implements LayoutManager2 {
                 int width = constraints.getWidth();
                 int height = constraints.getHeight();
 
-                // Si el tamaño no está especificado (-1), usar tamaño preferido
+                // If size is not specified (-1), use preferred size
                 if (width <= 0 || height <= 0) {
                     Dimension pref = comp.getPreferredSize();
                     if (width <= 0) width = pref.width;

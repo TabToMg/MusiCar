@@ -6,12 +6,12 @@
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="jMenu1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Archivo"/>
+            <Property name="text" type="java.lang.String" value="File"/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="jmenuP1">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Paso 1"/>
+                <Property name="text" type="java.lang.String" value="Step 1"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jmenuP1ActionPerformed"/>
@@ -21,12 +21,12 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Mas..."/>
+            <Property name="text" type="java.lang.String" value="More..."/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Contactame"/>
+                <Property name="text" type="java.lang.String" value="Contact me"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem1ActionPerformed"/>
@@ -39,7 +39,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
-    <Property name="title" type="java.lang.String" value="MusiCarRC v1.0 - Ordena La Musica Para Tu Coche"/>
+    <Property name="title" type="java.lang.String" value="MusiCarRC v1.0 - Organize Music For Your Car"/>
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
@@ -76,7 +76,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="btnRuta">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Seleccionar Destino"/>
+        <Property name="text" type="java.lang.String" value="Select Destination"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRutaActionPerformed"/>
@@ -197,7 +197,7 @@
           </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JFileChooser()"/>
-            <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="Elegir.setFileFilter(filtro);&#xa;&#xa;Elegir.setApproveButtonText(&quot;Seleccionar&quot;);"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="Elegir.setFileFilter(filtro);&#xa;&#xa;Elegir.setApproveButtonText(&quot;Select&quot;);"/>
           </AuxValues>
         </Component>
       </SubComponents>
@@ -205,7 +205,7 @@
     <Component class="javax.swing.JLabel" name="Fondo">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/Images/wallpaper6.jpg"/>
+          <Image iconType="3" name="/Images/WallpaperMC.jpg"/>
         </Property>
       </Properties>
       <Constraints>

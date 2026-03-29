@@ -23,32 +23,32 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
- * Aplicación para organizar y seleccionar archivos de música manualmente.
- * El usuario elige canciones una por una, edita sus nombres y las envía 
- * a la carpeta "Ordenada" en orden exacto de reproducción.
- * 
- * IMPORTANTE: Esta aplicación es 100% Java puro - no requiere herramientas 
- * externas como nircmd.exe. Todos los archivos se copian usando streams nativos.
+ * Application to organize and select music files manually.
+ * The user chooses songs one by one, edits their names and exports them
+ * to the "Ordered" folder in the exact playback order.
+ *
+ * IMPORTANT: This is pure Java and does not require external tools
+ * such as nircmd.exe. All files are copied using native Java streams.
  */
 public class FramePrincipal extends javax.swing.JFrame {
     
-    // IMPORTANTE: Contador y modelo para la lista de canciones seleccionadas
+    // IMPORTANT: Sequence counter and model for the selected songs list
     private int secuencia = 0;
     private DefaultListModel<String> modeloCancionesSeleccionadas;
     private java.util.List<File> archivosSeleccionados = new java.util.ArrayList<>();
-    private java.util.Map<String, File> mapaCancionesArchivos = new java.util.HashMap<>(); // Mapeo canción->archivo
-    private String nombreSeleccionadoActual; // Para actualizar el mapa cuando se edita nombre
-    // Fondo de la aplicación
+    private java.util.Map<String, File> mapaCancionesArchivos = new java.util.HashMap<>(); // mapping song->file
+    private String nombreSeleccionadoActual; // used to update the map when a name is edited
+    // Application background
     private JLabel backgroundLabel;
     private java.awt.Image fondoOriginal;
     
-    // Filtro para seleccionar solo archivos de música MP3 y WMA
+    // Filter to select common audio file types
     private FileNameExtensionFilter filtro = new FileNameExtensionFilter(
-        "Archivos de Música", "mp3", "wma", "wav", "flac", "m4a");
+        "Music Files", "mp3", "wma", "wav", "flac", "m4a");
     
     public FramePrincipal() {
         initComponents();
-        // Asignar icono del programa (carga sincrónica)
+        // Assign program icon (synchronous load)
         try {
             java.net.URL iconUrl = getClass().getResource("/Images/Icon2.png");
             if (iconUrl != null) {
@@ -56,28 +56,28 @@ public class FramePrincipal extends javax.swing.JFrame {
                 setIconImage(imgIconSync);
             }
         } catch (Exception e) {
-            // Ignorar si no se encuentra el recurso
+            // Ignore if the resource is not found
         }
 
-        // Agregar Fondo.png como fondo, escalado al tamaño de la ventana
+        // Add Fondo.png as the background, scaled to the window size
         try {
-            java.net.URL url = getClass().getResource("/Images/Fondo.png");
+            java.net.URL url = getClass().getResource("/Images/Fondo4.jpg");
             if (url != null) {
                 fondoOriginal = ImageIO.read(url);
                 backgroundLabel = new JLabel();
-                // Inicializar tamaño y icono
+                // Initialize size and icon
                 java.awt.Image scaled = fondoOriginal.getScaledInstance(this.getWidth(), this.getHeight(), Image.SCALE_SMOOTH);
                 backgroundLabel.setIcon(new ImageIcon(scaled));
                 backgroundLabel.setBounds(0, 0, this.getWidth(), this.getHeight());
 
-                // Añadir en la capa más baja posible para que quede siempre detrás
+                // Add to the lowest possible layer so it stays behind other components
                 getLayeredPane().add(backgroundLabel, Integer.valueOf(Integer.MIN_VALUE));
                 backgroundLabel.setVisible(true);
                 if (getContentPane() instanceof javax.swing.JComponent) {
                     ((javax.swing.JComponent) getContentPane()).setOpaque(false);
                 }
 
-                // Ajustar al redimensionar (aunque la ventana es fija, esto asegura correcto escalado)
+                // Adjust on resize (although window is fixed, this ensures correct scaling)
                 this.addComponentListener(new ComponentAdapter() {
                     @Override
                     public void componentResized(ComponentEvent e) {
@@ -85,14 +85,14 @@ public class FramePrincipal extends javax.swing.JFrame {
                             java.awt.Image img = fondoOriginal.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
                             backgroundLabel.setIcon(new ImageIcon(img));
                             backgroundLabel.setBounds(0, 0, getWidth(), getHeight());
-                            // Asegurar que el label de fondo permanezca siempre al fondo
+                            // Ensure the background label always stays at the back
                             getLayeredPane().setPosition(backgroundLabel, Integer.MIN_VALUE);
                         }
                     }
                 });
             }
         } catch (IOException e) {
-            // Ignorar errores de fondo
+            // Ignore background loading errors
         }
 
         this.setLocationRelativeTo(null);
@@ -100,32 +100,32 @@ public class FramePrincipal extends javax.swing.JFrame {
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        // Modelos delistas
+        // List models
         modeloCancionesSeleccionadas = new DefaultListModel<>();
         
-        // Componentes principales
-        JLabel lblBiblioteca = new JLabel("Biblioteca de Música:");
-        JLabel lblSeleccionadas = new JLabel("Canciones Seleccionadas:");
+        // Main components
+        JLabel lblBiblioteca = new JLabel("Music Library:");
+        JLabel lblSeleccionadas = new JLabel("Selected Songs:");
         
-        JButton btnExaminar = new JButton("Examinar Carpeta");
-        JButton btnAgregarCancion = new JButton(">> Agregar");
-        JButton btnRemoverCancion = new JButton("Remover");
-        JButton btnMoverArriba = new JButton("↑ Arriba");
-        JButton btnMoverAbajo = new JButton("↓ Abajo");
-        JButton btnEnviarOrdenada = new JButton("✓ Enviar a Carpeta \"Ordenada\"");
+        JButton btnExaminar = new JButton("Browse Folder");
+        JButton btnAgregarCancion = new JButton(">> Add");
+        JButton btnRemoverCancion = new JButton("Remove");
+        JButton btnMoverArriba = new JButton("↑ Up");
+        JButton btnMoverAbajo = new JButton("↓ Down");
+        JButton btnEnviarOrdenada = new JButton("✓ Export to \"Ordered\" Folder");
         
-        JLabel lblEditarNombre = new JLabel("Editar nombre de canción:");
+        JLabel lblEditarNombre = new JLabel("Edit song name:");
         txtEditarNombre = new JTextField();
-        JButton btnActualizarNombre = new JButton("Actualizar Nombre");
+        JButton btnActualizarNombre = new JButton("Update Name");
         
         JLabel lblMensaje = new JLabel("");
         
         listaCancionesDisponibles = new JList<>();
         listaCancionesSeleccionadas = new JList<>(modeloCancionesSeleccionadas);
         
-        // Configurar ventana principal
+        // Configure main window
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("MusiCar2 v2.0 - Organizador de Música para USB/SD");
+        setTitle("MusiCar2 v2.0 - Music Organizer for CD/USB/SD");
         // setIconImage(getIconImage()); // REMOVIDO: Causa problemas en JAR
         setSize(1100, 600);
         setResizable(false);
@@ -133,7 +133,7 @@ public class FramePrincipal extends javax.swing.JFrame {
         
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         
-        // PANEL IZQUIERDO: Explorador de carpetas y disponibles
+        // LEFT PANEL: Folder browser and available songs
         lblBiblioteca.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
         lblBiblioteca.setForeground(java.awt.Color.WHITE);
         getContentPane().add(lblBiblioteca, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 300, 20));
@@ -154,14 +154,14 @@ public class FramePrincipal extends javax.swing.JFrame {
                     if (idx != -1) {
                         String nombreOriginal = listaCancionesDisponibles.getModel().getElementAt(idx);
 
-                        // Evitar duplicados buscando por nombre original en la lista seleccionada
+                        // Avoid duplicates by checking the original name in the selected list
                         boolean existe = false;
                         for (int i = 0; i < modeloCancionesSeleccionadas.size(); i++) {
                             String elem = modeloCancionesSeleccionadas.get(i);
                             if (elem.endsWith(nombreOriginal)) { existe = true; break; }
                         }
                         if (existe) {
-                            // Si ya existe, simplemente seleccionar ese elemento
+                            // If it already exists, simply select that element
                             for (int i = 0; i < modeloCancionesSeleccionadas.size(); i++) {
                                 if (modeloCancionesSeleccionadas.get(i).endsWith(nombreOriginal)) {
                                     listaCancionesSeleccionadas.setSelectedIndex(i);
@@ -176,7 +176,7 @@ public class FramePrincipal extends javax.swing.JFrame {
                         String nombreFormato = String.format("%03d - %s", secuencia, nombreOriginal);
                         modeloCancionesSeleccionadas.addElement(nombreFormato);
 
-                        // Buscar el archivo en el mapa o en la lista de archivos cargados
+                        // Find the file in the map or in the loaded files list
                         File archivo = mapaCancionesArchivos.get(nombreOriginal);
                         if (archivo == null) {
                             for (File f : archivosSeleccionados) {
@@ -193,28 +193,28 @@ public class FramePrincipal extends javax.swing.JFrame {
         });
         getContentPane().add(listaCancionesDisponibles, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 300, 450));
         
-        // BOTONES CENTRALES
+        // CENTER BUTTONS
         btnAgregarCancion.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 11));
         btnAgregarCancion.setForeground(java.awt.Color.BLACK);
         btnAgregarCancion.addActionListener(evt -> btnAgregarCancionActionPerformed(evt));
         getContentPane().add(btnAgregarCancion, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 150, 80, 30));
 
-        // BOTON ALEATORIO: Añade aleatoriamente todas las canciones de la carpeta
-        JButton btnAleatorio = new JButton("Aleatorio");
+        // SHUFFLE BUTTON: Add all songs from the folder in random order
+        JButton btnAleatorio = new JButton("Shuffle");
         btnAleatorio.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 11));
         btnAleatorio.setForeground(java.awt.Color.BLACK);
         btnAleatorio.addActionListener(evt -> {
             if (archivosSeleccionados == null || archivosSeleccionados.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
-                    "No hay canciones cargadas. Usa 'Examinar Carpeta' primero.",
-                    "Información", JOptionPane.INFORMATION_MESSAGE);
+                    "No songs loaded. Use 'Browse Folder' first.",
+                    "Information", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
 
             java.util.List<File> copia = new java.util.ArrayList<>(archivosSeleccionados);
             java.util.Collections.shuffle(copia);
 
-            // Reemplazar completamente la lista seleccionada con el nuevo orden aleatorio
+            // Replace the selected list entirely with the new shuffled order
             modeloCancionesSeleccionadas.clear();
             mapaCancionesArchivos.clear();
             secuencia = 0;
@@ -227,7 +227,7 @@ public class FramePrincipal extends javax.swing.JFrame {
                 mapaCancionesArchivos.put(nombreFormato, archivo);
             }
 
-            // Seleccionar el primer elemento y cargar su nombre en el editor si existe
+            // Select the first element and load its name into the editor if present
             if (modeloCancionesSeleccionadas.size() > 0) {
                 listaCancionesSeleccionadas.setSelectedIndex(0);
                 String primero = modeloCancionesSeleccionadas.get(0);
@@ -236,7 +236,7 @@ public class FramePrincipal extends javax.swing.JFrame {
         });
         getContentPane().add(btnAleatorio, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 190, 80, 30));
         
-        // PANEL DERECHO: Canciones seleccionadas
+        // RIGHT PANEL: Selected songs
         lblSeleccionadas.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
         lblSeleccionadas.setForeground(java.awt.Color.WHITE);
         getContentPane().add(lblSeleccionadas, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 10, 300, 20));
@@ -248,7 +248,7 @@ public class FramePrincipal extends javax.swing.JFrame {
         listaCancionesSeleccionadas.addListSelectionListener(evt -> listaSeleccionadaActionPerformed(evt));
         getContentPane().add(listaCancionesSeleccionadas, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 35, 350, 320));
         
-        // Botones de orden
+        // Order buttons
         btnMoverArriba.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 11));
         btnMoverArriba.setForeground(java.awt.Color.BLACK);
         btnMoverArriba.addActionListener(evt -> btnMoverArribaActionPerformed(evt));
@@ -283,7 +283,7 @@ public class FramePrincipal extends javax.swing.JFrame {
         btnActualizarNombre.addActionListener(evt -> btnActualizarNombreActionPerformed(evt));
         getContentPane().add(btnActualizarNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(925, 385, 90, 30));
         
-        // Botón principal: Enviar a carpeta Ordenada
+        // Primary button: Export to Ordered folder
         btnEnviarOrdenada.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
         btnEnviarOrdenada.setBackground(new java.awt.Color(0, 150, 0));
         btnEnviarOrdenada.setForeground(java.awt.Color.WHITE);
@@ -305,14 +305,14 @@ public class FramePrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     /**
-     * IMPORTANTE: Abre un diálogo para examinar la biblioteca de música del usuario.
-     * El usuario elige una carpeta y se carga la lista de archivos disponibles.
+     * IMPORTANT: Opens a dialog to browse the user's music library.
+     * The user chooses a folder and the available files are loaded.
      */
     private void btnExaminarActionPerformed(java.awt.event.ActionEvent evt) {
         JFileChooser seleccionador = new JFileChooser();
         seleccionador.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        seleccionador.setApproveButtonText("Examinar");
-        seleccionador.setDialogTitle("Selecciona tu carpeta de música");
+        seleccionador.setApproveButtonText("Browse");
+        seleccionador.setDialogTitle("Select your music folder");
 
         int resultado = seleccionador.showOpenDialog(this);
         if (resultado == JFileChooser.APPROVE_OPTION) {
@@ -322,8 +322,8 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
     /**
-     * IMPORTANTE: Carga la lista de canciones disponibles de una carpeta.
-     * Solo muestra archivos de audio soportados.
+     * IMPORTANT: Loads the list of available songs from a folder.
+     * Only supported audio files are shown.
      */
     private void cargarCancionesDisponibles(File carpeta) {
         DefaultListModel<String> modelo = new DefaultListModel<>();
@@ -342,28 +342,28 @@ public class FramePrincipal extends javax.swing.JFrame {
                 String nombreOriginal = archivo.getName();
                 modelo.addElement(nombreOriginal);
                 archivosSeleccionados.add(archivo);
-                // IMPORTANTE: Guardar mapeo nombre -> archivo
+                // IMPORTANT: Save mapping name -> file
                 mapaCancionesArchivos.put(nombreOriginal, archivo);
             }
             listaCancionesDisponibles.setModel(modelo);
         } else {
             JOptionPane.showMessageDialog(this, 
-                "No se encontraron archivos de música en esta carpeta.", 
-                "Información", JOptionPane.INFORMATION_MESSAGE);
+                "No music files found in this folder.", 
+                "Information", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
     /**
-     * IMPORTANTE: Agrega la canción seleccionada a la lista de reproducción ordenada.
-     * La canción se agrega al final manteniendo el número secuencial.
+     * IMPORTANT: Adds the selected song to the ordered playlist.
+     * The song is appended while maintaining sequential numbering.
      */
     private void btnAgregarCancionActionPerformed(java.awt.event.ActionEvent evt) {
         int indiceSeleccionado = listaCancionesDisponibles.getSelectedIndex();
         
         if (indiceSeleccionado == -1) {
             JOptionPane.showMessageDialog(this, 
-                "Selecciona una canción primero", 
-                "Advertencia", JOptionPane.WARNING_MESSAGE);
+                "Select a song first", 
+                "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -373,7 +373,7 @@ public class FramePrincipal extends javax.swing.JFrame {
         
         modeloCancionesSeleccionadas.addElement(nombreFormato);
         
-        // IMPORTANTE: Guardar el mapeo de la canción formateada al archivo original
+        // IMPORTANT: Save mapping of the formatted song name to the original file
         mapaCancionesArchivos.put(nombreFormato, mapaCancionesArchivos.get(nombreOriginal));
         
         // Cargar el nombre en el editor
@@ -381,15 +381,15 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
     /**
-     * IMPORTANTE: Remueve la canción seleccionada de la lista ordenada.
+     * IMPORTANT: Removes the selected song from the ordered list.
      */
     private void btnRemoverCancionActionPerformed(java.awt.event.ActionEvent evt) {
         int indiceSeleccionado = listaCancionesSeleccionadas.getSelectedIndex();
         
         if (indiceSeleccionado == -1) {
             JOptionPane.showMessageDialog(this, 
-                "Selecciona una canción para remover", 
-                "Advertencia", JOptionPane.WARNING_MESSAGE);
+                "Select a song to remove", 
+                "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -427,7 +427,7 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
     /**
-     * IMPORTANTE: Reordena la secuencia de números cuando se modifica la lista.
+     * IMPORTANT: Reorders the sequence numbers when the list is modified.
      */
     private void reordenarSecuencia() {
         java.util.Map<String, File> mapaTemporal = new java.util.HashMap<>();
@@ -446,7 +446,7 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
     /**
-     * IMPORTANTE: Carga el nombre de la canción en el editor cuando se selecciona.
+     * IMPORTANT: Loads the song name into the editor when an item is selected.
      */
     private void listaSeleccionadaActionPerformed(javax.swing.event.ListSelectionEvent evt) {
         if (evt.getValueIsAdjusting()) return;
@@ -461,22 +461,22 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
     /**
-     * IMPORTANTE: Actualiza el nombre de la canción en la lista.
+     * IMPORTANT: Updates the song name in the list.
      */
     private void btnActualizarNombreActionPerformed(java.awt.event.ActionEvent evt) {
         int indiceSeleccionado = listaCancionesSeleccionadas.getSelectedIndex();
         
         if (indiceSeleccionado == -1) {
             JOptionPane.showMessageDialog(this, 
-                "Selecciona una canción para editar", 
-                "Advertencia", JOptionPane.WARNING_MESSAGE);
+                "Select a song to edit", 
+                "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         String nuevoNombre = txtEditarNombre.getText().trim();
         if (nuevoNombre.isEmpty()) {
             JOptionPane.showMessageDialog(this, 
-                "El nombre no puede estar vacío", 
+                "Name cannot be empty", 
                 "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -484,28 +484,28 @@ public class FramePrincipal extends javax.swing.JFrame {
         String elementoActualizado = String.format("%03d - %s", indiceSeleccionado + 1, nuevoNombre);
         modeloCancionesSeleccionadas.set(indiceSeleccionado, elementoActualizado);
         
-        // IMPORTANTE: Actualizar el mapa para que apunte al nuevo nombre
+        // IMPORTANT: Update the map to point to the new name
         File archivo = mapaCancionesArchivos.remove(nombreSeleccionadoActual);
         mapaCancionesArchivos.put(elementoActualizado, archivo);
     }
 
     /**
-     * IMPORTANTE: Envía todas las canciones a la carpeta "Ordenada" en orden exacto.
-     * Crea la carpeta si no existe y copia los archivos renombrados.
+     * IMPORTANT: Exports all songs to the "Ordered" folder in exact order.
+     * Creates the folder if it does not exist and copies the renamed files.
      */
     private void btnEnviarOrdenada_ActionPerformed(java.awt.event.ActionEvent evt) {
         if (modeloCancionesSeleccionadas.size() == 0) {
             JOptionPane.showMessageDialog(this, 
-                "Agrega al menos una canción primero", 
-                "Advertencia", JOptionPane.WARNING_MESSAGE);
+                "Add at least one song first", 
+                "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // Crear carpeta "Ordenada" en Documentos del usuario
+        // Create the "Ordered" folder inside the user's Music directory
         String rutaDocumentos = System.getProperty("user.home") + File.separator + "Music";
-        File carpetaOrdenada = new File(rutaDocumentos + File.separator + "Ordenada");
-        
-        // IMPORTANTE: Si la carpeta ya existe, eliminarla completamente
+        File carpetaOrdenada = new File(rutaDocumentos + File.separator + "Ordered");
+
+        // IMPORTANT: If the folder already exists, delete it completely
         if (carpetaOrdenada.exists()) {
             try {
                 java.nio.file.Files.walk(java.nio.file.Paths.get(carpetaOrdenada.getAbsolutePath()))
@@ -514,15 +514,15 @@ public class FramePrincipal extends javax.swing.JFrame {
                     .forEach(java.io.File::delete);
             } catch (java.io.IOException e) {
                 JOptionPane.showMessageDialog(this, 
-                    "Error eliminando carpeta anterior: " + e.getMessage(), 
+                    "Error deleting previous folder: " + e.getMessage(), 
                     "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }
-        
+
         if (!carpetaOrdenada.mkdirs()) {
             JOptionPane.showMessageDialog(this, 
-                "No se pudo crear la carpeta 'Ordenada'", 
+                "Could not create the 'Ordered' folder", 
                 "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -538,14 +538,14 @@ public class FramePrincipal extends javax.swing.JFrame {
             
             if (archivoOriginal != null && archivoOriginal.exists()) {
                 try {
-                    // IMPORTANTE: Siempre usar la extensión original del archivo
+                    // IMPORTANT: Always preserve the file's original extension
                     String extension = archivoOriginal.getName().substring(
                             archivoOriginal.getName().lastIndexOf("."));
                     
                     // Extraer el nombre editado sin el número
                     String nombreSinNumero = nombreEnLista.substring(nombreEnLista.indexOf("-") + 2);
                     
-                    // IMPORTANTE: Si el nombre editado termina con la extensión, quitarla para evitar duplicados
+                    // IMPORTANT: If the edited name ends with the extension, strip it to avoid duplicates
                     String nombreBase = nombreSinNumero;
                     if (nombreBase.toLowerCase().endsWith(extension.toLowerCase())) {
                         nombreBase = nombreBase.substring(0, nombreBase.length() - extension.length());
@@ -568,34 +568,34 @@ public class FramePrincipal extends javax.swing.JFrame {
 
         StringBuilder respuesta = new StringBuilder();
         respuesta.append("════════════════════════════════════\n");
-        respuesta.append("     CANCIONES ORGANIZADAS EXITOSAMENTE\n");
+        respuesta.append("     SONGS SUCCESSFULLY ORGANIZED\n");
         respuesta.append("════════════════════════════════════\n\n");
         respuesta.append(mensajeResultado);
         respuesta.append("\n════════════════════════════════════\n");
-        respuesta.append("✓ Canciones copiadas: ").append(copiadasExitosas).append(" de ").append(modeloCancionesSeleccionadas.size()).append("\n");
-        respuesta.append("📁 Ubicación: ").append(carpetaOrdenada.getAbsolutePath()).append("\n");
+        respuesta.append("✓ Songs copied: ").append(copiadasExitosas).append(" of ").append(modeloCancionesSeleccionadas.size()).append("\n");
+        respuesta.append("Location: ").append(carpetaOrdenada.getAbsolutePath()).append("\n");
         respuesta.append("════════════════════════════════════\n\n");
-        respuesta.append("Ahora puedes copiar esta carpeta a tu USB o SD.\n");
-        respuesta.append("Las canciones se reproducirán en este orden exact.");
-        
+        respuesta.append("You can now copy this folder to your USB or SD.\n");
+        respuesta.append("Songs will play in this exact order.");
+
         JOptionPane.showMessageDialog(this, 
             respuesta.toString(), 
-            "✓ Éxito", 
+            "Success", 
             JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
-     * IMPORTANTE: Copia un archivo de origen a destino usando streams de Java puro.
-     * NO utiliza herramientas externas como nircmd.exe - todo se hace con FileInputStream
-     * y FileOutputStream para máxima compatibilidad y portabilidad.
-     * 
-     * @param origen - Archivo fuente a copiar
-     * @param destino - Archivo destino donde copiar
-     * @throws IOException si ocurre un error durante la copia
+     * IMPORTANT: Copy a source file to a destination using pure Java streams.
+     * Does NOT use external tools like nircmd.exe - uses FileInputStream
+     * and FileOutputStream for maximum compatibility and portability.
+     *
+     * @param origen - source file to copy
+     * @param destino - destination file
+     * @throws IOException if an error occurs during the copy
      */
     private void copiarArchivo(File origen, File destino) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(destino)) {
-            byte[] buffer = new byte[8192]; // Buffer de 8KB para copia eficiente
+            byte[] buffer = new byte[8192]; // 8KB buffer for efficient copying
             int bytesLeidos;
             
             try (FileInputStream fis = new FileInputStream(origen)) {
@@ -647,13 +647,13 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
 /**
- * IMPORTANTE: Agrega ceros a la izquierda de un número para formateo.
- * Ejemplo: agregarCeros("5", 3) retorna "005"
- * Usado para ordenar archivos de música secuencialmente.
- * 
- * @param numero - Número a formatear
- * @param longitudDeseada - Longitud total deseada
- * @return Número con ceros a la izquierda
+ * IMPORTANT: Pad a number with leading zeros for formatting.
+ * Example: agregarCeros("5", 3) returns "005"
+ * Used to create sequentially ordered filenames.
+ *
+ * @param numero - number string to format
+ * @param longitudDeseada - total desired length
+ * @return number string padded with leading zeros
  */
 private static String agregarCeros(String numero, int longitudDeseada) {
     int cerosAgregar = longitudDeseada - numero.length();
@@ -664,12 +664,12 @@ private static String agregarCeros(String numero, int longitudDeseada) {
 }
 
     /**
-     * IMPORTANTE: Reemplaza caracteres acentuados por sus equivalentes sin acento.
-     * Necesario para evitar errores en sistemas que no soportan acentos.
-     * Ejemplo: acentos("Música") retorna "Musica"
-     * 
-     * @param texto - Texto con posibles acentos
-     * @return Texto sin acentos
+     * IMPORTANT: Replace accented characters with their non-accented equivalents.
+     * Useful to avoid issues on systems that do not support accented characters.
+     * Example: acentos("Música") returns "Musica"
+     *
+     * @param texto - input text that may contain accents
+     * @return text without accents
      */
     private String acentos(String texto) {
         if (texto == null) {

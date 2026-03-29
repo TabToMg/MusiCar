@@ -3,7 +3,7 @@
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>C:\Users\PC-NOX\Documents\APLICACION\Musicar2.jar</jar>
-  <outfile>C:\Users\PC-NOX\Documents\APLICACION\MCAR4.exe</outfile>
+  <outfile>C:\Users\PC-NOX\Documents\APLICACION\MCAR666.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -13,7 +13,7 @@
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\PC-NOX\Documents\APLICACION\ICONO333.ico</icon>
+  <icon>C:\Users\PC-NOX\Documents\APLICACION\Icon.ico</icon>
   <jre>
     <path>%JAVA_HOME%;%PATH%</path>
     <requiresJdk>false</requiresJdk>

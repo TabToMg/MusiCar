@@ -4,8 +4,8 @@ import java.awt.Dimension;
 import java.awt.Point;
 
 /**
- * Restricciones para el layout AbsoluteLayout de NetBeans.
- * Define la posición y tamaño de un componente en coordenadas absolutas.
+ * Constraints for the NetBeans AbsoluteLayout.
+ * Defines the position and size of a component using absolute coordinates.
  */
 public class AbsoluteConstraints {
     private int x;
@@ -14,7 +14,7 @@ public class AbsoluteConstraints {
     private int height;
 
     /**
-     * Constructor con posición (x, y)
+     * Constructor with position (x, y)
      */
     public AbsoluteConstraints(int x, int y) {
         this.x = x;
@@ -24,7 +24,7 @@ public class AbsoluteConstraints {
     }
 
     /**
-     * Constructor con posición y tamaño (x, y, width, height)
+     * Constructor with position and size (x, y, width, height)
      */
     public AbsoluteConstraints(int x, int y, int width, int height) {
         this.x = x;
