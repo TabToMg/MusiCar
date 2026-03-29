@@ -241,10 +241,8 @@ REQUISITOS DEL SISTEMA:
 DESARROLLO Y SOPORTE:
 ================================================================================
 
-Desarrollado por: RompeCuellos
-Email: magr1911@gmail.com
-YouTube: youtube.com/user/rompecuellos1
-Facebook: RompeCuellos
+Desarrollado por: TabToMg
+Email: mgtoireland@gmail.com
 
 Para reportar errores o sugerencias, contacta por email.
 
