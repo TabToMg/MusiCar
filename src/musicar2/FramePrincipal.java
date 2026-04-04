@@ -21,6 +21,15 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.border.AbstractBorder;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.Insets;
 
 /**
  * Application to organize and select music files manually.
@@ -38,15 +47,16 @@ public class FramePrincipal extends javax.swing.JFrame {
     private java.util.List<File> archivosSeleccionados = new java.util.ArrayList<>();
     private java.util.Map<String, File> mapaCancionesArchivos = new java.util.HashMap<>(); // mapping song->file
     private String nombreSeleccionadoActual; // used to update the map when a name is edited
-    // Application background
-    private JLabel backgroundLabel;
-    private java.awt.Image fondoOriginal;
+    // Application background (custom painted for dark theme)
+    private javax.swing.JComponent backgroundPanel;
     
     // Filter to select common audio file types
     private FileNameExtensionFilter filtro = new FileNameExtensionFilter(
         "Music Files", "mp3", "wma", "wav", "flac", "m4a");
     
     public FramePrincipal() {
+        // Apply a modern dark theme before creating components
+        applyModernDarkTheme();
         initComponents();
         // Assign program icon (synchronous load)
         try {
@@ -59,43 +69,157 @@ public class FramePrincipal extends javax.swing.JFrame {
             // Ignore if the resource is not found
         }
 
-        // Add Fondo.png as the background, scaled to the window size
-        try {
-            java.net.URL url = getClass().getResource("/Images/Fondo4.jpg");
-            if (url != null) {
-                fondoOriginal = ImageIO.read(url);
-                backgroundLabel = new JLabel();
-                // Initialize size and icon
-                java.awt.Image scaled = fondoOriginal.getScaledInstance(this.getWidth(), this.getHeight(), Image.SCALE_SMOOTH);
-                backgroundLabel.setIcon(new ImageIcon(scaled));
-                backgroundLabel.setBounds(0, 0, this.getWidth(), this.getHeight());
+        // Create a programmatic dark background panel (gradient + subtle vignette)
+        backgroundPanel = new javax.swing.JComponent() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                // Add to the lowest possible layer so it stays behind other components
-                getLayeredPane().add(backgroundLabel, Integer.valueOf(Integer.MIN_VALUE));
-                backgroundLabel.setVisible(true);
-                if (getContentPane() instanceof javax.swing.JComponent) {
-                    ((javax.swing.JComponent) getContentPane()).setOpaque(false);
-                }
+                int w = getWidth();
+                int h = getHeight();
 
-                // Adjust on resize (although window is fixed, this ensures correct scaling)
-                this.addComponentListener(new ComponentAdapter() {
-                    @Override
-                    public void componentResized(ComponentEvent e) {
-                        if (fondoOriginal != null && backgroundLabel != null) {
-                            java.awt.Image img = fondoOriginal.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
-                            backgroundLabel.setIcon(new ImageIcon(img));
-                            backgroundLabel.setBounds(0, 0, getWidth(), getHeight());
-                            // Ensure the background label always stays at the back
-                            getLayeredPane().setPosition(backgroundLabel, Integer.MIN_VALUE);
-                        }
-                    }
-                });
+                // Vertical gradient (very dark blue -> dark gray)
+                Color top = new Color(10, 12, 16);
+                Color bottom = new Color(30, 32, 35);
+                java.awt.GradientPaint gp = new java.awt.GradientPaint(0, 0, top, 0, h, bottom);
+                g2.setPaint(gp);
+                g2.fillRect(0, 0, w, h);
+
+                // Subtle vignette (darken edges)
+                float[] dist = {0.0f, 0.7f, 1.0f};
+                Color[] cols = {new Color(0,0,0,0), new Color(0,0,0,60), new Color(0,0,0,150)};
+                java.awt.RadialGradientPaint rgp = new java.awt.RadialGradientPaint(
+                        new java.awt.Point(w/2, h/2), Math.max(w, h) * 0.75f, dist, cols);
+                g2.setPaint(rgp);
+                g2.fillRect(0, 0, w, h);
+
+                g2.dispose();
             }
-        } catch (IOException e) {
-            // Ignore background loading errors
+        };
+
+        backgroundPanel.setBounds(0, 0, this.getWidth(), this.getHeight());
+        getLayeredPane().add(backgroundPanel, Integer.valueOf(Integer.MIN_VALUE));
+        backgroundPanel.setVisible(true);
+        if (getContentPane() instanceof javax.swing.JComponent) {
+            ((javax.swing.JComponent) getContentPane()).setOpaque(false);
         }
 
+        // Adjust on resize
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                if (backgroundPanel != null) {
+                    backgroundPanel.setBounds(0, 0, getWidth(), getHeight());
+                    backgroundPanel.repaint();
+                    getLayeredPane().setPosition(backgroundPanel, Integer.MIN_VALUE);
+                }
+            }
+        });
+
         this.setLocationRelativeTo(null);
+    }
+
+    /** Apply a compact modern dark theme using UI defaults. */
+    private void applyModernDarkTheme() {
+        try {
+            UIManager.put("control", new ColorUIResource(30, 30, 30));
+            UIManager.put("Panel.background", new ColorUIResource(30, 30, 30));
+            UIManager.put("List.background", new ColorUIResource(18, 18, 18));
+            UIManager.put("List.foreground", new ColorUIResource(230, 230, 230));
+            UIManager.put("Label.foreground", new ColorUIResource(220, 220, 220));
+            UIManager.put("Button.background", new ColorUIResource(50, 50, 50));
+            UIManager.put("Button.foreground", new ColorUIResource(240, 240, 240));
+            UIManager.put("TextField.background", new ColorUIResource(28, 28, 28));
+            UIManager.put("TextField.foreground", new ColorUIResource(230, 230, 230));
+            UIManager.put("TextField.caretForeground", new ColorUIResource(200, 200, 200));
+            UIManager.put("ScrollPane.background", new ColorUIResource(24, 24, 24));
+            UIManager.put("ToolTip.background", new ColorUIResource(60, 60, 60));
+            UIManager.put("ToolTip.foreground", new ColorUIResource(240, 240, 240));
+            UIManager.put("OptionPane.background", new ColorUIResource(30, 30, 30));
+            UIManager.put("OptionPane.messageForeground", new ColorUIResource(230, 230, 230));
+        } catch (Exception e) {
+            // If anything fails, continue with defaults
+        }
+    }
+
+    /** Small helper to style buttons with rounded borders and colors. */
+    private void styleButton(JButton b, String variant) {
+        b.setFocusPainted(false);
+        b.setOpaque(true);
+        b.setBorder(new RoundedBorder(12));
+        b.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, Math.max(11, b.getFont().getSize())));
+        b.setForeground(new Color(245, 245, 245));
+        switch (variant) {
+            case "primary":
+                b.setBackground(new Color(38, 166, 91));
+                break;
+            case "accent":
+                b.setBackground(new Color(0, 120, 215));
+                break;
+            case "danger":
+                b.setBackground(new Color(200, 60, 60));
+                break;
+            default:
+                b.setBackground(new Color(70, 70, 70));
+                break;
+        }
+        b.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+    }
+
+    /** Simple rounded border for modern button visuals. */
+    private static class RoundedBorder extends AbstractBorder {
+        private final int radius;
+        private final Color edge = new Color(60, 60, 60, 200);
+
+        RoundedBorder(int radius) { this.radius = radius; }
+
+        @Override
+        public void paintBorder(java.awt.Component c, Graphics g, int x, int y, int width, int height) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(edge);
+            RoundRectangle2D.Float r = new RoundRectangle2D.Float(x + 1, y + 1, width - 2, height - 2, radius, radius);
+            g2.draw(r);
+            g2.dispose();
+        }
+
+        @Override
+        public Insets getBorderInsets(java.awt.Component c) { return new Insets(6, 12, 6, 12); }
+
+        @Override
+        public Insets getBorderInsets(java.awt.Component c, Insets insets) {
+            insets.left = insets.right = 12;
+            insets.top = insets.bottom = 6;
+            return insets;
+        }
+    }
+
+    /** Custom renderer to give JLists a modern padded look. */
+    private static class ListItemRenderer extends javax.swing.JLabel implements javax.swing.ListCellRenderer<Object> {
+        private final Color bg = new Color(22, 22, 22);
+        private final Color selBg = new Color(0, 120, 215);
+        private final Color fg = new Color(230, 230, 230);
+
+        ListItemRenderer() {
+            setOpaque(true);
+            setBorder(javax.swing.BorderFactory.createEmptyBorder(6, 10, 6, 10));
+            setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+        }
+
+        @Override
+        public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            setText(String.valueOf(value));
+            if (isSelected) {
+                setBackground(selBg);
+                setForeground(new Color(255, 255, 255));
+            } else {
+                setBackground(bg);
+                setForeground(fg);
+            }
+            return this;
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -112,7 +236,7 @@ public class FramePrincipal extends javax.swing.JFrame {
         JButton btnRemoverCancion = new JButton("Remove");
         JButton btnMoverArriba = new JButton("↑ Up");
         JButton btnMoverAbajo = new JButton("↓ Down");
-        JButton btnEnviarOrdenada = new JButton("✓ Export to \"Ordered\" Folder");
+        JButton btnEnviarOrdenada = new JButton("Export to \"Organized\" Folder");
         
         JLabel lblEditarNombre = new JLabel("Edit song name:");
         txtEditarNombre = new JTextField();
@@ -134,18 +258,20 @@ public class FramePrincipal extends javax.swing.JFrame {
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         
         // LEFT PANEL: Folder browser and available songs
-        lblBiblioteca.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
-        lblBiblioteca.setForeground(java.awt.Color.WHITE);
+        lblBiblioteca.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 13));
+        lblBiblioteca.setForeground(new java.awt.Color(220, 220, 220));
         getContentPane().add(lblBiblioteca, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 300, 20));
         
         btnExaminar.addActionListener(evt -> btnExaminarActionPerformed(evt));
-        btnExaminar.setForeground(java.awt.Color.BLACK);
+        styleButton(btnExaminar, "secondary");
         getContentPane().add(btnExaminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 35, 140, 30));
         
-        listaCancionesDisponibles.setBackground(new java.awt.Color(50, 50, 50));
-        listaCancionesDisponibles.setForeground(java.awt.Color.WHITE);
-        listaCancionesDisponibles.setFont(new java.awt.Font("Arial", 0, 10));
-        listaCancionesDisponibles.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(120, 120, 120), 2));
+        listaCancionesDisponibles.setBackground(new java.awt.Color(22, 22, 22));
+        listaCancionesDisponibles.setForeground(new java.awt.Color(230, 230, 230));
+        listaCancionesDisponibles.setFont(new java.awt.Font("Segoe UI", 0, 12));
+        listaCancionesDisponibles.setBorder(new RoundedBorder(10));
+        listaCancionesDisponibles.setCellRenderer(new ListItemRenderer());
+        listaCancionesDisponibles.setFixedCellHeight(30);
         listaCancionesDisponibles.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -195,14 +321,13 @@ public class FramePrincipal extends javax.swing.JFrame {
         
         // CENTER BUTTONS
         btnAgregarCancion.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 11));
-        btnAgregarCancion.setForeground(java.awt.Color.BLACK);
         btnAgregarCancion.addActionListener(evt -> btnAgregarCancionActionPerformed(evt));
+        styleButton(btnAgregarCancion, "accent");
         getContentPane().add(btnAgregarCancion, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 150, 80, 30));
 
         // SHUFFLE BUTTON: Add all songs from the folder in random order
         JButton btnAleatorio = new JButton("Shuffle");
         btnAleatorio.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 11));
-        btnAleatorio.setForeground(java.awt.Color.BLACK);
         btnAleatorio.addActionListener(evt -> {
             if (archivosSeleccionados == null || archivosSeleccionados.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
@@ -234,62 +359,58 @@ public class FramePrincipal extends javax.swing.JFrame {
                 txtEditarNombre.setText(primero.substring(primero.indexOf("-") + 2));
             }
         });
+        styleButton(btnAleatorio, "accent");
         getContentPane().add(btnAleatorio, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 190, 80, 30));
         
         // RIGHT PANEL: Selected songs
-        lblSeleccionadas.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
-        lblSeleccionadas.setForeground(java.awt.Color.WHITE);
+        lblSeleccionadas.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 13));
+        lblSeleccionadas.setForeground(new java.awt.Color(220, 220, 220));
         getContentPane().add(lblSeleccionadas, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 10, 300, 20));
-        
-        listaCancionesSeleccionadas.setBackground(new java.awt.Color(30, 80, 30));
-        listaCancionesSeleccionadas.setForeground(java.awt.Color.WHITE);
-        listaCancionesSeleccionadas.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 10));
-        listaCancionesSeleccionadas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(120, 120, 120), 2));
+        listaCancionesSeleccionadas.setBackground(new java.awt.Color(22, 22, 22));
+        listaCancionesSeleccionadas.setForeground(new java.awt.Color(230, 230, 230));
+        listaCancionesSeleccionadas.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+        listaCancionesSeleccionadas.setBorder(new RoundedBorder(10));
+        listaCancionesSeleccionadas.setCellRenderer(new ListItemRenderer());
+        listaCancionesSeleccionadas.setFixedCellHeight(30);
         listaCancionesSeleccionadas.addListSelectionListener(evt -> listaSeleccionadaActionPerformed(evt));
         getContentPane().add(listaCancionesSeleccionadas, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 35, 350, 320));
         
         // Order buttons
         btnMoverArriba.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 11));
-        btnMoverArriba.setForeground(java.awt.Color.BLACK);
         btnMoverArriba.addActionListener(evt -> btnMoverArribaActionPerformed(evt));
+        styleButton(btnMoverArriba, "secondary");
         getContentPane().add(btnMoverArriba, new org.netbeans.lib.awtextra.AbsoluteConstraints(765, 35, 80, 30));
         
         btnMoverAbajo.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 11));
-        btnMoverAbajo.setForeground(java.awt.Color.BLACK);
         btnMoverAbajo.addActionListener(evt -> btnMoverAbajoActionPerformed(evt));
+        styleButton(btnMoverAbajo, "secondary");
         getContentPane().add(btnMoverAbajo, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 35, 80, 30));
         
         btnRemoverCancion.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 11));
-        btnRemoverCancion.setForeground(java.awt.Color.WHITE);
-        btnRemoverCancion.setBackground(java.awt.Color.RED);
-        btnRemoverCancion.setOpaque(true);
         btnRemoverCancion.addActionListener(evt -> btnRemoverCancionActionPerformed(evt));
+        styleButton(btnRemoverCancion, "danger");
         getContentPane().add(btnRemoverCancion, new org.netbeans.lib.awtextra.AbsoluteConstraints(935, 35, 80, 30));
         
         // Editor de nombre
-        lblEditarNombre.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 11));
-        lblEditarNombre.setForeground(java.awt.Color.WHITE);
+        lblEditarNombre.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+        lblEditarNombre.setForeground(new java.awt.Color(220, 220, 220));
         getContentPane().add(lblEditarNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 360, 250, 20));
         
-        txtEditarNombre.setFont(new java.awt.Font("Arial", 0, 11));
-        txtEditarNombre.setBackground(new java.awt.Color(40, 40, 40));
-        txtEditarNombre.setForeground(java.awt.Color.WHITE);
+        txtEditarNombre.setFont(new java.awt.Font("Segoe UI", 0, 12));
+        txtEditarNombre.setBackground(new java.awt.Color(28, 28, 28));
+        txtEditarNombre.setForeground(new java.awt.Color(230, 230, 230));
+        txtEditarNombre.setBorder(new RoundedBorder(8));
         getContentPane().add(txtEditarNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 385, 510, 30));
         
         btnActualizarNombre.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 11));
-        btnActualizarNombre.setBackground(new java.awt.Color(0, 100, 200));
-        btnActualizarNombre.setForeground(java.awt.Color.WHITE);
-        btnActualizarNombre.setOpaque(true);
         btnActualizarNombre.addActionListener(evt -> btnActualizarNombreActionPerformed(evt));
+        styleButton(btnActualizarNombre, "accent");
         getContentPane().add(btnActualizarNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(925, 385, 90, 30));
         
         // Primary button: Export to Ordered folder
         btnEnviarOrdenada.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
-        btnEnviarOrdenada.setBackground(new java.awt.Color(0, 150, 0));
-        btnEnviarOrdenada.setForeground(java.awt.Color.WHITE);
-        btnEnviarOrdenada.setOpaque(true);
-        btnEnviarOrdenada.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.DARK_GRAY, 2));
         btnEnviarOrdenada.addActionListener(evt -> btnEnviarOrdenada_ActionPerformed(evt));
+        styleButton(btnEnviarOrdenada, "primary");
         getContentPane().add(btnEnviarOrdenada, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 425, 510, 50));
         
         // Mensaje de estado
@@ -313,6 +434,15 @@ public class FramePrincipal extends javax.swing.JFrame {
         seleccionador.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         seleccionador.setApproveButtonText("Browse");
         seleccionador.setDialogTitle("Select your music folder");
+
+        // Ensure the file chooser uses a light background so file/folder names are readable
+        try {
+            seleccionador.setBackground(java.awt.Color.WHITE);
+            seleccionador.setForeground(java.awt.Color.BLACK);
+            fixFileChooserColors(seleccionador);
+        } catch (Exception e) {
+            // ignore if look-and-feel prevents direct changes
+        }
 
         int resultado = seleccionador.showOpenDialog(this);
         if (resultado == JFileChooser.APPROVE_OPTION) {
@@ -503,7 +633,7 @@ public class FramePrincipal extends javax.swing.JFrame {
 
         // Create the "Ordered" folder inside the user's Music directory
         String rutaDocumentos = System.getProperty("user.home") + File.separator + "Music";
-        File carpetaOrdenada = new File(rutaDocumentos + File.separator + "Ordered");
+        File carpetaOrdenada = new File(rutaDocumentos + File.separator + "Organized");
 
         // IMPORTANT: If the folder already exists, delete it completely
         if (carpetaOrdenada.exists()) {
@@ -522,7 +652,7 @@ public class FramePrincipal extends javax.swing.JFrame {
 
         if (!carpetaOrdenada.mkdirs()) {
             JOptionPane.showMessageDialog(this, 
-                "Could not create the 'Ordered' folder", 
+                "Could not create the 'Organized' folder", 
                 "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -602,6 +732,44 @@ public class FramePrincipal extends javax.swing.JFrame {
                 while ((bytesLeidos = fis.read(buffer)) != -1) {
                     fos.write(buffer, 0, bytesLeidos);
                 }
+            }
+        }
+    }
+
+    /** Recursively set light colors on JFileChooser components for readability. */
+    private void fixFileChooserColors(java.awt.Component comp) {
+        if (comp == null) return;
+
+        if (comp instanceof javax.swing.JList) {
+            javax.swing.JList<?> list = (javax.swing.JList<?>) comp;
+            list.setBackground(java.awt.Color.WHITE);
+            list.setForeground(java.awt.Color.BLACK);
+        } else if (comp instanceof javax.swing.JTable) {
+            javax.swing.JTable table = (javax.swing.JTable) comp;
+            table.setBackground(java.awt.Color.WHITE);
+            table.setForeground(java.awt.Color.BLACK);
+            if (table.getTableHeader() != null) {
+                table.getTableHeader().setBackground(new java.awt.Color(240,240,240));
+                table.getTableHeader().setForeground(java.awt.Color.BLACK);
+            }
+        } else if (comp instanceof javax.swing.JTree) {
+            javax.swing.JTree tree = (javax.swing.JTree) comp;
+            tree.setBackground(java.awt.Color.WHITE);
+            tree.setForeground(java.awt.Color.BLACK);
+        } else if (comp instanceof javax.swing.JTextField) {
+            javax.swing.JTextField tf = (javax.swing.JTextField) comp;
+            tf.setBackground(java.awt.Color.WHITE);
+            tf.setForeground(java.awt.Color.BLACK);
+            tf.setCaretColor(java.awt.Color.BLACK);
+        } else if (comp instanceof javax.swing.JComponent) {
+            javax.swing.JComponent jc = (javax.swing.JComponent) comp;
+            jc.setBackground(java.awt.Color.WHITE);
+            jc.setForeground(java.awt.Color.BLACK);
+        }
+
+        if (comp instanceof java.awt.Container) {
+            for (java.awt.Component child : ((java.awt.Container) comp).getComponents()) {
+                fixFileChooserColors(child);
             }
         }
     }
