@@ -71,8 +71,22 @@ Musicar now provides a more intuitive and user-friendly experience:
 - File renaming for consistent playback  
 - Optimized export for CD / USB / SD usage  
 - Designed specifically for compatibility with older car systems  
+## 📸 Screenshots
+
+<p align="center">
+  <img src="https://i.ibb.co/JY53Mn7/Screenshot1.png" alt="Screenshot 1" width="600"/>
+</p>
+
+<p align="center">
+  <img src="https://i.ibb.co/nNYqNRKk/Screenshot2.png" alt="Screenshot 2" width="600"/>
+</p>
+
+<p align="center">
+  <img src="https://i.ibb.co/bMRcqKqf/Screenshot3.png" alt="Screenshot 3" width="600"/>
+</p>
 
 ---
+
 
 ## 🛠️ Technologies
 
